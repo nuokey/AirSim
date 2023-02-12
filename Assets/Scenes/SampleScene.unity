@@ -150,7 +150,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 160077855}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -267.41486, y: 156.827, z: -313.656}
+  m_LocalPosition: {x: 0, y: -0.66, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 0.46}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -244,7 +244,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 227971450}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 133.70743, y: -157.6531, z: 47.36688}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 1, z: 0.152207}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -718,7 +718,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 990202195}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -267.41486, y: 156.827, z: -308.64}
+  m_LocalPosition: {x: 0, y: -0.73, z: 2.56}
   m_LocalScale: {x: 0.34, y: 1, z: 0.46}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1114,10 +1114,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f85699035df36384b84385783192c990, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  engineForce: 10000
+  engineForce: 15000
   throttle: 0
   eleronsTorque: 5000
   upDownTorque: 5000
   leftRightTorque: 5000
   rb: {fileID: 1830605462}
   aerodynamicForce: 1000
+  optimalAngle: 5
+  defaultDrag: 0.2
+  angleDragCoef: 0.2

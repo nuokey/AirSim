@@ -13,6 +13,12 @@ public class Plane : MonoBehaviour
     public Rigidbody rb;
 
     public float aerodynamicForce;
+
+    public float optimalAngle;
+
+    public float defaultDrag;
+
+    public float angleDragCoef;
     void FixedUpdate()
     {
         var fwdSpeed = Vector3.Dot(rb.velocity, transform.forward);
@@ -60,6 +66,8 @@ public class Plane : MonoBehaviour
         
 
         rb.AddForce(transform.forward * engineForce * throttle);
-        rb.AddForce(transform.up * aerodynamicForce * fwdSpeed);
+        rb.AddForce(new Vector3(0, 1, 0) * (optimalAngle - transform.localRotation.x) * aerodynamicForce * fwdSpeed);
+
+        rb.drag = defaultDrag + angleDragCoef * Mathf.Abs(transform.localRotation.x);
     }
 }
