@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Plane : MonoBehaviour
-{
+{   
     public float engineForce;
+    public float cruiseSpeed;
+    public float maxSpeed;
+
     public float throttle;
     public float eleronsTorque;
     public float upDownTorque;
@@ -19,6 +22,19 @@ public class Plane : MonoBehaviour
     public float defaultDrag;
 
     public float angleDragCoef;
+    public float angleAeroCoef;
+
+    public float airSpeed;
+    public float verticalSpeed;
+
+    private void Start()
+    {
+        cruiseSpeed /= 3.6f;
+        maxSpeed /= 3.6f;
+        aerodynamicForce = rb.mass * 10 / (cruiseSpeed);
+        engineForce = maxSpeed * rb.mass * rb.drag;
+    }
+
     void FixedUpdate()
     {
         var fwdSpeed = Vector3.Dot(rb.velocity, transform.forward);
@@ -65,9 +81,13 @@ public class Plane : MonoBehaviour
 
         
 
-        rb.AddForce(transform.forward * engineForce * throttle);
-        rb.AddForce(new Vector3(0, 1, 0) * (optimalAngle - transform.localRotation.x) * aerodynamicForce * fwdSpeed);
+        rb.AddForce(transform.forward * (engineForce * throttle + transform.localRotation.x * angleDragCoef));
+        rb.AddForce(new Vector3(0, 1, 0) * (aerodynamicForce + transform.localRotation.x * angleAeroCoef) * fwdSpeed);
 
-        rb.drag = defaultDrag + angleDragCoef * Mathf.Abs(transform.localRotation.x);
+
+        // rb.drag = defaultDrag + angleDragCoef * Mathf.Abs(transform.localRotation.x);
+        airSpeed = fwdSpeed;
+        verticalSpeed = rb.velocity.y;
+
     }
 }
