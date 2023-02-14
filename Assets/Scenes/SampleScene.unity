@@ -505,8 +505,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 761635298}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10000, y: 1, z: 10000}
+  m_LocalPosition: {x: 0, y: -500, z: 0}
+  m_LocalScale: {x: 100000, y: 1000, z: 100000}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -564,7 +564,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 100000
-  field of view: 60
+  field of view: 80
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1089,7 +1089,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1830605457}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 5.05, z: 0}
   m_LocalScale: {x: 2, y: 1, z: 6.57}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1107,7 +1107,7 @@ Rigidbody:
   m_GameObject: {fileID: 1830605457}
   serializedVersion: 2
   m_Mass: 1500
-  m_Drag: 0.01
+  m_Drag: 0
   m_AngularDrag: 2
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -1126,18 +1126,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f85699035df36384b84385783192c990, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  engineForce: 15000
   cruiseSpeed: 190
   maxSpeed: 400
-  throttle: 0
+  drag: 0.1
+  airPressureDefault: 100000
+  airDensity: 0
+  cruiseHeight: 0
   eleronsTorque: 5000
   upDownTorque: 5000
   leftRightTorque: 5000
-  rb: {fileID: 1830605462}
-  aerodynamicForce: 625
-  optimalAngle: 5
-  defaultDrag: 0.1
-  angleDragCoef: 10
-  angleAeroCoef: 0
+  throttle: 0
+  engineForce: 15000
+  aerodynamicCoef: 0
   airSpeed: 0
   verticalSpeed: 0
+  verticalAirSpeed: 0
+  aerodynamicForce: 0
+  dragForce: {x: 0, y: 0, z: 0}
+  verticalDragForce: 0
+  rb: {fileID: 1830605462}

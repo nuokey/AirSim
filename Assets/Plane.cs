@@ -4,41 +4,80 @@ using UnityEngine;
 
 public class Plane : MonoBehaviour
 {   
-    public float engineForce;
     public float cruiseSpeed;
     public float maxSpeed;
-
-    public float throttle;
+    public float drag;
+    public float airPressureDefault;
+    public float airDensity;
+    public float cruiseHeight;
     public float eleronsTorque;
     public float upDownTorque;
     public float leftRightTorque;
 
-    public Rigidbody rb;
+    public float throttle;
+    public float engineForce;
 
-    public float aerodynamicForce;
-
-    public float optimalAngle;
-
-    public float defaultDrag;
-
-    public float angleDragCoef;
-    public float angleAeroCoef;
+    public float aerodynamicCoef;
 
     public float airSpeed;
     public float verticalSpeed;
+    public float verticalAirSpeed;
+
+    public float aerodynamicForce;
+
+    public Vector3 dragForce;
+
+    public float verticalDragForce;
+
+    public Rigidbody rb;
+
+    float AerodynamicForce(float coef, float speed, float airDensity)
+    {
+        var force = (coef) * speed * speed * airDensity;
+        return force;
+    }
+
+    Vector3 DragForce(float coef, Vector3 velocity)
+    {
+        var force = new Vector3(velocity.x * velocity.x, velocity.y * velocity.y, velocity.z * velocity.z) * -coef;
+        return force;
+    }
+
+    float VerticalDragForce(float coef, float velocity)
+    {
+        var force = velocity * velocity * -coef;
+        return force;
+    }
+
+    void Forces()
+    {
+
+    }
+
+    void Control()
+    {
+        
+    }
 
     private void Start()
     {
         cruiseSpeed /= 3.6f;
         maxSpeed /= 3.6f;
-        aerodynamicForce = rb.mass * 10 / (cruiseSpeed);
-        engineForce = maxSpeed * rb.mass * rb.drag;
+        aerodynamicCoef = rb.mass * 10 / (cruiseSpeed * cruiseSpeed * airPressureDefault * Mathf.Exp(-0.029f * 9.81f / 300 * cruiseHeight / 8.31f));
+        engineForce = maxSpeed * maxSpeed * drag;
     }
 
     void FixedUpdate()
     {
+        airDensity = airPressureDefault * Mathf.Exp(-0.029f * 9.81f / 300 * transform.position.y / 8.31f);
+
         var fwdSpeed = Vector3.Dot(rb.velocity, transform.forward);
+        verticalAirSpeed = Vector3.Dot(rb.velocity, transform.forward);
         var fwdEleronTorque = Vector3.Dot(new Vector3(0, 0, eleronsTorque), transform.forward);
+
+        aerodynamicForce = AerodynamicForce(aerodynamicCoef, fwdSpeed, airDensity);
+        dragForce = DragForce(drag, rb.velocity);
+        verticalDragForce = VerticalDragForce(drag, verticalAirSpeed);
 
 
         if (Input.GetKey(KeyCode.UpArrow)) {
@@ -79,10 +118,10 @@ public class Plane : MonoBehaviour
             rb.AddRelativeTorque(new Vector3(0, leftRightTorque, 0));
         }
 
-        
+        rb.AddForce(dragForce);
 
-        rb.AddForce(transform.forward * (engineForce * throttle + transform.localRotation.x * angleDragCoef));
-        rb.AddForce(new Vector3(0, 1, 0) * (aerodynamicForce + transform.localRotation.x * angleAeroCoef) * fwdSpeed);
+        rb.AddForce(transform.forward * engineForce * throttle);
+        rb.AddForce(transform.up * aerodynamicForce);
 
 
         // rb.drag = defaultDrag + angleDragCoef * Mathf.Abs(transform.localRotation.x);

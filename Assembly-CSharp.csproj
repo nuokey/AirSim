@@ -58,9 +58,9 @@
   <ItemGroup>
     <Compile Include="Assets\Plane.cs" />
     <Compile Include="Assets\AirSpeedUI.cs" />
-    <Compile Include="Assets\Camera.cs" />
     <Compile Include="Assets\NewBehaviourScript.cs" />
     <Compile Include="Assets\VerticalSpeedUI.cs" />
+    <Compile Include="Assets\Camera.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
