@@ -6,6 +6,8 @@ public class Plane : MonoBehaviour
 {   
     public float cruiseSpeed;
     public float maxSpeed;
+    public float takeOffSpeed;
+
     public float drag;
     public float airPressureDefault;
     public float airDensity;
@@ -18,6 +20,7 @@ public class Plane : MonoBehaviour
     public float engineForce;
 
     public float aerodynamicCoef;
+    public float aerodynamicAgnleCoef;
 
     public float airSpeed;
     public float verticalSpeed;
@@ -31,9 +34,18 @@ public class Plane : MonoBehaviour
 
     public Rigidbody rb;
 
-    float AerodynamicForce(float coef, float speed, float airDensity)
+    public Vector3 playerOffset;
+
+    float AerodynamicForce(float coef, float angleCoef, float speed, float verticalSpeed, float airDensity)
     {
-        var force = (coef) * speed * speed * airDensity;
+        var angleForce = verticalSpeed  * verticalSpeed * angleCoef;
+
+        if (verticalSpeed > 0)
+        {
+            angleForce *= -1;
+        }
+
+        var force = (coef) * speed * speed * airDensity + angleForce;
         return force;
     }
 
@@ -56,31 +68,8 @@ public class Plane : MonoBehaviour
 
     void Control()
     {
-        
-    }
-
-    private void Start()
-    {
-        cruiseSpeed /= 3.6f;
-        maxSpeed /= 3.6f;
-        aerodynamicCoef = rb.mass * 10 / (cruiseSpeed * cruiseSpeed * airPressureDefault * Mathf.Exp(-0.029f * 9.81f / 300 * cruiseHeight / 8.31f));
-        engineForce = maxSpeed * maxSpeed * drag;
-    }
-
-    void FixedUpdate()
-    {
-        airDensity = airPressureDefault * Mathf.Exp(-0.029f * 9.81f / 300 * transform.position.y / 8.31f);
-
-        var fwdSpeed = Vector3.Dot(rb.velocity, transform.forward);
-        verticalAirSpeed = Vector3.Dot(rb.velocity, transform.forward);
-        var fwdEleronTorque = Vector3.Dot(new Vector3(0, 0, eleronsTorque), transform.forward);
-
-        aerodynamicForce = AerodynamicForce(aerodynamicCoef, fwdSpeed, airDensity);
-        dragForce = DragForce(drag, rb.velocity);
-        verticalDragForce = VerticalDragForce(drag, verticalAirSpeed);
-
-
-        if (Input.GetKey(KeyCode.UpArrow)) {
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
             if (throttle < 1)
             {
                 throttle += 0.01f;
@@ -117,6 +106,35 @@ public class Plane : MonoBehaviour
         {
             rb.AddRelativeTorque(new Vector3(0, leftRightTorque, 0));
         }
+    }
+
+    private void Start()
+    {
+        var takeOffAngle = 5f;
+        cruiseSpeed /= 3.6f;
+        maxSpeed /= 3.6f;
+
+        
+        aerodynamicCoef = rb.mass * 9.81f / (cruiseSpeed * cruiseSpeed * airPressureDefault * Mathf.Exp(-0.029f * 9.81f / 300 * cruiseHeight / 8.31f));
+        aerodynamicAgnleCoef = (rb.mass * 9.81f - takeOffSpeed * takeOffSpeed * aerodynamicCoef) / (Mathf.Asin(Mathf.Deg2Rad * takeOffAngle) * takeOffSpeed);
+        engineForce = maxSpeed * maxSpeed * drag;
+    }
+
+    void FixedUpdate()
+    {
+        Control();
+        airDensity = airPressureDefault * Mathf.Exp(-0.029f * 9.81f / 300 * transform.position.y / 8.31f);
+
+        var fwdSpeed = Vector3.Dot(rb.velocity, transform.forward);
+        verticalAirSpeed = Vector3.Dot(rb.velocity, transform.up);
+        var fwdEleronTorque = Vector3.Dot(new Vector3(0, 0, eleronsTorque), transform.forward);
+
+        aerodynamicForce = AerodynamicForce(aerodynamicCoef, aerodynamicAgnleCoef, fwdSpeed, verticalAirSpeed, airDensity);
+        dragForce = DragForce(drag, rb.velocity);
+        verticalDragForce = VerticalDragForce(drag, verticalAirSpeed);
+
+
+        
 
         rb.AddForce(dragForce);
 
