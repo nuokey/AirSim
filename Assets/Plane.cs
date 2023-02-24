@@ -36,6 +36,8 @@ public class Plane : MonoBehaviour
 
     public Vector3 playerOffset;
 
+    public GameObject player;
+
     float AerodynamicForce(float coef, float angleCoef, float speed, float verticalSpeed, float airDensity)
     {
         var angleForce = verticalSpeed  * verticalSpeed * angleCoef;
@@ -51,7 +53,22 @@ public class Plane : MonoBehaviour
 
     Vector3 DragForce(float coef, Vector3 velocity)
     {
-        var force = new Vector3(velocity.x * velocity.x, velocity.y * velocity.y, velocity.z * velocity.z) * -coef;
+        var xModifier = 1;
+        if (velocity.x < 0)
+        {
+            xModifier = -1;
+        }
+        var yModifier = 1;
+        if (velocity.y < 0)
+        {
+            yModifier = -1;
+        }
+        var zModifier = 1;
+        if (velocity.z < 0)
+        {
+            zModifier = -1;
+        }
+        var force = new Vector3(velocity.x * velocity.x * xModifier, velocity.y * velocity.y * yModifier, velocity.z * velocity.z * zModifier) * -coef;
         return force;
     }
 
@@ -63,7 +80,28 @@ public class Plane : MonoBehaviour
 
     void Forces()
     {
+        airDensity = airPressureDefault * Mathf.Exp(-0.029f * 9.81f / 300 * transform.position.y / 8.31f);
 
+        var fwdSpeed = Vector3.Dot(rb.velocity, transform.forward);
+        verticalAirSpeed = Vector3.Dot(rb.velocity, transform.up);
+        var fwdEleronTorque = Vector3.Dot(new Vector3(0, 0, eleronsTorque), transform.forward);
+
+        aerodynamicForce = AerodynamicForce(aerodynamicCoef, aerodynamicAgnleCoef, fwdSpeed, verticalAirSpeed, airDensity);
+        dragForce = DragForce(drag, rb.velocity);
+        verticalDragForce = VerticalDragForce(drag, verticalAirSpeed);
+
+
+
+
+        rb.AddForce(dragForce);
+
+        rb.AddForce(transform.forward * engineForce * throttle);
+        rb.AddForce(transform.up * aerodynamicForce);
+
+
+        // rb.drag = defaultDrag + angleDragCoef * Mathf.Abs(transform.localRotation.x);
+        airSpeed = fwdSpeed;
+        verticalSpeed = rb.velocity.y;
     }
 
     void Control()
@@ -106,6 +144,14 @@ public class Plane : MonoBehaviour
         {
             rb.AddRelativeTorque(new Vector3(0, leftRightTorque, 0));
         }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            transform.GetChild(0).GetChild(0).GetComponent<BoxCollider>().material.dynamicFriction = 1;
+        }
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            transform.GetChild(0).GetChild(0).GetComponent<BoxCollider>().material.dynamicFriction = 0.1f;
+        }
     }
 
     private void Start()
@@ -118,33 +164,17 @@ public class Plane : MonoBehaviour
         aerodynamicCoef = rb.mass * 9.81f / (cruiseSpeed * cruiseSpeed * airPressureDefault * Mathf.Exp(-0.029f * 9.81f / 300 * cruiseHeight / 8.31f));
         aerodynamicAgnleCoef = (rb.mass * 9.81f - takeOffSpeed * takeOffSpeed * aerodynamicCoef) / (Mathf.Asin(Mathf.Deg2Rad * takeOffAngle) * takeOffSpeed);
         engineForce = maxSpeed * maxSpeed * drag;
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     void FixedUpdate()
-    {
-        Control();
-        airDensity = airPressureDefault * Mathf.Exp(-0.029f * 9.81f / 300 * transform.position.y / 8.31f);
-
-        var fwdSpeed = Vector3.Dot(rb.velocity, transform.forward);
-        verticalAirSpeed = Vector3.Dot(rb.velocity, transform.up);
-        var fwdEleronTorque = Vector3.Dot(new Vector3(0, 0, eleronsTorque), transform.forward);
-
-        aerodynamicForce = AerodynamicForce(aerodynamicCoef, aerodynamicAgnleCoef, fwdSpeed, verticalAirSpeed, airDensity);
-        dragForce = DragForce(drag, rb.velocity);
-        verticalDragForce = VerticalDragForce(drag, verticalAirSpeed);
-
-
+    {   
+        if (player.transform.parent == transform)
+        {
+            Control();
+        }
         
-
-        rb.AddForce(dragForce);
-
-        rb.AddForce(transform.forward * engineForce * throttle);
-        rb.AddForce(transform.up * aerodynamicForce);
-
-
-        // rb.drag = defaultDrag + angleDragCoef * Mathf.Abs(transform.localRotation.x);
-        airSpeed = fwdSpeed;
-        verticalSpeed = rb.velocity.y;
+        Forces();
 
     }
 }

@@ -12,6 +12,17 @@ public class Player : MonoBehaviour
 
     public new Transform camera;
 
+    void Control()
+    {
+        if (Input.GetKey(KeyCode.E))
+        {
+            if (transform.parent.tag == "Vehicle")
+            {
+
+            }
+        }
+    }
+
     private void Start()
     {
         Cursor.visible = false;
@@ -34,5 +45,6 @@ public class Player : MonoBehaviour
     {
         CameraRotation();
         Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 }
