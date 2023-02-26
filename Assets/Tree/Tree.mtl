@@ -9,7 +9,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd E:/Projects/Unity/AirSim/Assets/Tree1.png
+map_Kd Assets/Tree/Tree1.png
 
 newmtl Material.002
 Ns 250.000000
@@ -19,4 +19,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd E:/Projects/Unity/AirSim/Assets/Tree2.png
+map_Kd Assets/Tree/Tree2.png

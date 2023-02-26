@@ -10,6 +10,6 @@ public class AirSpeedUI : MonoBehaviour
 
     void Update()
     {
-        transform.GetComponent<Text>().text = "Air Speed:" + System.Convert.ToInt32(playerPlane.GetComponent<Plane>().airSpeed * 3.6).ToString() + "km/h";
+        transform.GetComponent<TextMesh>().text = "Air Speed:" + System.Convert.ToInt32(playerPlane.GetComponent<Plane>().airSpeed * 3.6).ToString() + "km/h";
     }
 }
